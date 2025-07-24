@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>従業員リスト管理</title>
+    <style>
+        table { border-collapse: collapse; width: 60%; margin-top: 1em; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+        input[type="text"] { width: 150px; }
+    </style>
+</head>
+<body>
+    <h2>👥 従業員リスト管理</h2>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>名前</th>
+            <th>操作</th>
+        </tr>
+        {% for emp in employees %}
+        <tr>
+            <td>{{ emp.id }}</td>
+            <td>
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="id" value="{{ emp.id }}">
+                    <input type="text" name="name" value="{{ emp.name }}">
+                    <button type="submit">更新</button>
+                </form>
+            </td>
+            <td>
+                <form method="post" style="display:inline;" onsubmit="return confirm('本当に削除しますか？');">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="id" value="{{ emp.id }}">
+                    <button type="submit">削除</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h3>🆕 従業員を追加</h3>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        <input type="text" name="name" placeholder="新しい従業員名">
+        <button type="submit">追加</button>
+    </form>
+
+    <br><a href="{% url 'index' %}">← トップページへ戻る</a>
+</body>
+</html>

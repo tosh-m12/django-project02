@@ -1,0 +1,55 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>日報集計</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        .name-link { color: blue; text-decoration: underline; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>📅 日報集計（{{ target_date }}）</h2>
+
+    <form method="get">
+        <label>表示日付：</label>
+        <input type="date" name="date" value="{{ target_date }}">
+        <button type="submit">表示</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>氏名</th>
+            <th>入庫</th><th>出庫</th><th>発貨</th><th>通関</th><th>集配</th><th>特殊</th><th>備考</th>
+        </tr>
+        {% for emp in employees %}
+        {% with reports|get_item:emp.id as rep %}
+        <tr>
+            <!-- <td><a href="#" class="name-link">{{ emp.name }}</a></td> -->
+            <td><a href="{% url 'employee_edit' emp.id %}">{{ emp.name }}</a></td>
+            <td>{{ rep.inbound|default:"-" }}</td>
+            <td>{{ rep.outbound|default:"-" }}</td>
+            <td>{{ rep.shipment|default:"-" }}</td>
+            <td>{{ rep.customs|default:"-" }}</td>
+            <td>{{ rep.delivery|default:"-" }}</td>
+            <td>{{ rep.special_tag|default:"-" }}</td>
+            <td style="text-align: left;">{{ rep.remarks|default:"" }}</td>
+        </tr>
+        {% endwith %}
+        {% endfor %}
+    </table>
+
+    <form method="get" action="{% url 'download_csv' %}" style="margin-top: 1em;">
+        <input type="hidden" name="date" value="{{ target_date|date:'Y-m-d' }}">
+        <label>
+            <input type="checkbox" name="all_data"> 全期間のデータをダウンロード
+        </label>
+        <button type="submit">CSVダウンロード</button>
+    </form>
+
+
+</body>
+</html>
